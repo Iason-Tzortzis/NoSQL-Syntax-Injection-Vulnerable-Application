@@ -1,0 +1,35 @@
+# version: "3.8" no longer needed
+volumes:
+  db:
+
+services:
+  app:
+    container_name: nosql_syntax_injection_vulnerable_app
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=${PORT}
+      - MONGODB_URI=${MONGODB_URI}
+      - MONGODB_DATABASE=${MONGODB_DATABASE}
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - db
+    links:
+      - db
+
+  db:
+    container_name: mongodb
+    image: mongo:latest
+    restart: always
+    volumes:
+      - db:/data/db
+    command: mongod
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGODB_DATABASE}
+    ports:
+      - 27017:27017
